@@ -89,14 +89,20 @@ def cimwrite(d, source, encoding="utf-8"):
 
         # Serialise references.
         for klass in mro[2:]: # skip 'object' and 'Element'
-            # FIXME: serialise 'many' references.
-            refs = [r for r in klass._refs if r not in klass._many_refs]
+            refs = [r for r in klass._refs]
             for ref in refs:
                 val = getattr(obj, ref)
-                if val is not None:
-                    w.element(u"%s:%s.%s" % (nsPrefix, klass.__name__, ref),
-                          attrib={u"%s:resource" % nsPrefixRDF:
-                                  u"#%s" % val.UUID})
+                if ref in klass._many_refs:
+                    if type(val) is list:
+                        for v in val:
+                            w.element(u"%s:%s.%s" % (nsPrefix, klass.__name__, ref),
+                                      attrib={u"%s:resource" % nsPrefixRDF:
+                                              u"#%s" % v.UUID})
+                else:
+                    if val is not None:
+                        w.element(u"%s:%s.%s" % (nsPrefix, klass.__name__, ref),
+                                  attrib={u"%s:resource" % nsPrefixRDF:
+                                          u"#%s" % val.UUID})
 
         w.end()
 
