@@ -60,8 +60,8 @@ def cimwrite(d, source, encoding="utf-8"):
     xmlns = {u"xmlns:%s" % nsPrefixRDF: nsRDF, u"xmlns:%s" % nsPrefix: nsCIM}
     rdf = w.start(u"%s:RDF" % nsPrefixRDF, xmlns)
 
-    # Iterate over all UUID, CIM object pairs in the given dictionary.
-    for uuid, obj in d.items():
+    # Iterate over all UUID, CIM object pairs in the given dictionary sorted after classname.
+    for uuid, obj in sorted(d.items(), key=lambda p: (type(p[1]).__name__, p[0])):
         w.start(u"%s:%s" % (nsPrefix, obj.__class__.__name__),
                 {u"%s:ID" % nsPrefixRDF: obj.UUID})
 
